@@ -11,8 +11,8 @@ using UnityEngine;
  * on the disc. */
 public class DiscHandler : MonoBehaviour
 {
-    // Dict to hold all discs
-    Dictionary<float, Disc> Discs = new Dictionary<double, Disc>();
+    /*// Dict to hold all discs
+    Dictionary<float, Disk> Disks = new Dictionary<double, Disk>();
 
     // Float for making new IDs
     float ID;
@@ -33,19 +33,19 @@ public class DiscHandler : MonoBehaviour
 
     void MakeDisc(int size)
     {
-        Disc newDisc = new Disc(size);
+        Disk newDisk = new Disk(size);
         ID = Random.Range(00000, 99999);
-        while (Discs.ContainsKey(ID))
+        while (Disks.ContainsKey(ID))
         {
             ID = Random.Range(00000, 99999);
         }
-        Discs[ID] = newDisc;
+        Disks[ID] = newDisk;
     }
 
     // Call when 'compiling' the disc; dID = disc ID
     void UpdateDisc(float dID)
     {
-        Disc disc = Discs[dID];
+        Disk disc = Disks[dID];
         // have each tile update what it's connected to
         for (int i = 0; i < disc.tiles.length; i++)
         {
@@ -54,5 +54,5 @@ public class DiscHandler : MonoBehaviour
                 //Update the tile here
             }
         }
-    }
+    }*/
 }

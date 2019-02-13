@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Disk : MonoBehaviour
+public class Disc : MonoBehaviour
 {
    //Disk class
-   public Disk(int x)
+   public Disc(int size)
     {
-
+        //The size paramater of the disk determines
     }
+
+
 }

@@ -70,7 +70,8 @@ public class Tile : MonoBehaviour
     {
     
         Tile mytile = new Tile();
-        print_tile();
+        //print_tile();
+        
    
 
     }
