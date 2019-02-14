@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ControllerHandler : MonoBehaviour
 {
+    public DiscHandler discHandler;
+
     // Object in a collision
     public GameObject collidingObj;
 
@@ -42,10 +44,33 @@ public class ControllerHandler : MonoBehaviour
         {
             if (collidingObj && !objInHand)
             {
+                // If we are picking up a tile that is attached to a disc,
+                // call RemoveTile() from DiscHandler script
+                if (collidingObj.CompareTag("Tile") && collidingObj.GetComponentInParent<GameObject>().CompareTag("Disc"))
+                {
+                    discHandler.RemoveTile(collidingObj, collidingObj.GetComponentInParent<GameObject>(), this.transform);
+                }
+                else
+                {
+                    
+                }
                 GrabObject();
             }
 
-            else if (objInHand)
+            else if (collidingObj && objInHand)
+            {
+                // If the object is a tile and is over the disc,
+                // call PlaceTile() from the DiscHandler script
+                if (collidingObj.CompareTag("Tile") && collidingObj.GetComponentInParent<GameObject>().CompareTag("Disc"))
+                {
+                    discHandler.PlaceTile(collidingObj, collidingObj.GetComponentInParent<GameObject>());
+                }
+                else
+                {
+                    ReleaseObject();
+                }
+            }
+            else
             {
                 ReleaseObject();
             }
