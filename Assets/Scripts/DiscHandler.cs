@@ -156,10 +156,7 @@ public class DiscHandler : MonoBehaviour
 
     Vector3 GetCellCenter(Vector2 index, Transform discTrans)
     {
-        int x = Mathf.RoundToInt(index.x);
-        int z = Mathf.RoundToInt(index.y);
-
-
+        
     }
 
     // RemoveTile: Disconnects a Tile from the board, 
