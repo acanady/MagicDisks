@@ -11,23 +11,24 @@ using UnityEngine;
  * on the disc. */
 public class DiscHandler : MonoBehaviour
 {
-    public struct signal
-    {
-        public int element; //Type of element
-        public int units; //The amount of element being passed through
-        public int inout; //0 for input 1 for output
-
-        public signal(int elem, int uni, int ino)
-        {
-            element = elem;
-            units = uni;
-            inout = ino;
-
-        }
-    }
+    
 
     public class Tile
     {
+        public struct signal
+        {
+            public int element; //Type of element
+            public int units; //The amount of element being passed through
+            public int inout; //0 for input 1 for output
+
+            public signal(int elem, int uni, int ino)
+            {
+                element = elem;
+                units = uni;
+                inout = ino;
+
+            }
+        }
 
         //The Tile uses data from the signal struct in order to create the tile
 
@@ -80,7 +81,7 @@ public class DiscHandler : MonoBehaviour
         //Creates a Tile type from the Tile class
         public Tile mytile = new Tile();
     }
-
+    //End of Tile Class
 
 
     // All tiles and discs will have a single script on them that gives ID
@@ -92,7 +93,7 @@ public class DiscHandler : MonoBehaviour
     Dictionary<int, Disc> Discs = new Dictionary<int, Disc>();
 
     //Dict to hold all tiles based on a specific ID
-    Dictionary<int, Tile> Disc = new Dictionary<int, Tile>();
+    Dictionary<int, Tile> Tiles = new Dictionary<int, Tile>();
 
     // Float for making new IDs
     int ID;
@@ -111,15 +112,29 @@ public class DiscHandler : MonoBehaviour
         
     }
 
-    void MakeDisc(int size)
+    void makeDisc(int size)
     {
         Disc newDisc = new Disc(size);
         ID = Random.Range(00000, 99999);
         while (Discs.ContainsKey(ID))
         {
             ID = Random.Range(00000, 99999);
+            Debug.Log("Getting new ID for Disc");
         }
         Discs[ID] = newDisc;
+    }
+
+    void makeTile()
+    {
+        Tile newTile = new Tile();
+        ID = Random.Range(0, 100);
+        while (Tiles.ContainsKey(ID))
+        {
+            ID = Random.Range(0, 100);
+            Debug.Log("Getting new ID for tile");
+        }
+        newTile.ID = ID;
+        Tiles[ID] = newTile;
     }
 
     // Call when 'compiling' the disc; dID = disc ID
