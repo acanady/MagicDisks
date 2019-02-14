@@ -10,5 +10,4 @@ public class Disc : MonoBehaviour
         //The size paramater of the disk determines
     }
 
-
 }

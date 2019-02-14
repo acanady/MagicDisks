@@ -122,11 +122,4 @@ public class ifTile : Tile
         Debug.Log("type: " + types[type]); //references the array of types to pring out the work for the type of tile it is
     }
 
-    public void Start()
-    {
-        ifTile mytile = new ifTile();
-        print_iftile();
-
-    }
-
 }

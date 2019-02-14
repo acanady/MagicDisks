@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class test : MonoBehaviour
 {
     string[] elems = new string[] { "neutral", "earth", "fire", "wind", "water" };

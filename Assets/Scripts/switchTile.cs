@@ -75,10 +75,4 @@ public class switchTile : Tile
         print_tile();
         Debug.Log("inversion is: " + inversion);
     }
-
-    public void Start()
-    {
-        switchTile mytile = new switchTile();
-        print_switchTile();
-    }
 }
