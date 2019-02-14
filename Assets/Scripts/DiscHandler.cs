@@ -21,7 +21,7 @@ public class DiscHandler : MonoBehaviour
     Dictionary<int, Disc> Discs = new Dictionary<int, Disc>();
 
     // Float for making new IDs
-    float ID;
+    int ID;
 
     // ----[Disc Class Goes Here]----
 
