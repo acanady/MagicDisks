@@ -244,56 +244,6 @@ public class DiscHandler : MonoBehaviour
 
     Vector3 GetCellCenter(Vector2 index)
     {
-        
-    }
-
-    // RemoveTile: Disconnects a Tile from the board, 
-    //             Edits the disc array of tiles
-    //             Attachs tile to controller
-    void RemoveTile(GameObject tile, GameObject disc, Transform conTrans)
-    {
-        // Get array position of the tile
-        Vector2 pos = GetTileIndex(tile, disc);
-        // Use disc function to update the status of the pos in the array
-
-        tile.GetComponent<Transform>().SetParent(conTrans);
-        tile.GetComponent<Rigidbody>().isKinematic = true;
-        tile.GetComponent<Rigidbody>().useGravity = false;
-    }
-
-
-    // PlaceTile: Checks the position of the tile relative to disc,
-    //            Determines the corresponding grid position and location in array
-    //            If position is empty, disconnect tile from con and place on disk
-    //            Else do nothing, maybe flash outline red
-    void PlaceTile(GameObject tile, GameObject disc)
-    {
-        // temporarily make the tile a child of the disc to get local pos
-        tile.GetComponent<Transform>().SetParent(disc.transform);
-        tile.GetComponent<Rigidbody>().isKinematic = true;
-        tile.GetComponent<Rigidbody>().useGravity = false;
-
-        Vector2 pos = GetTileIndex(tile, disc);
-
-        // Check if that cell is full
-        // if it is, don't place the tile, break
-
-        Vector3 dist = GetCellCenter(pos);
-
-        tile.GetComponent<Transform>().localPosition = dist;
-        tile.GetComponent<Transform>().rotation = disc.transform.rotation;
-    }
-
-
-}
-
-    public class Disc
-    {
-        public int ID;
-
-    }
-
-    // Dict to hold all discs based on a specific ID
         int x = Mathf.RoundToInt(index.x);
         int z = Mathf.RoundToInt(index.y);
 
@@ -364,6 +314,56 @@ public class DiscHandler : MonoBehaviour
 
         Vector3 dist = new Vector3(h, 0f, w);
         return dist;
+    }
+
+    // RemoveTile: Disconnects a Tile from the board, 
+    //             Edits the disc array of tiles
+    //             Attachs tile to controller
+    void RemoveTile(GameObject tile, GameObject disc, Transform conTrans)
+    {
+        // Get array position of the tile
+        Vector2 pos = GetTileIndex(tile, disc);
+        // Use disc function to update the status of the pos in the array
+
+        tile.GetComponent<Transform>().SetParent(conTrans);
+        tile.GetComponent<Rigidbody>().isKinematic = true;
+        tile.GetComponent<Rigidbody>().useGravity = false;
+    }
+
+
+    // PlaceTile: Checks the position of the tile relative to disc,
+    //            Determines the corresponding grid position and location in array
+    //            If position is empty, disconnect tile from con and place on disk
+    //            Else do nothing, maybe flash outline red
+    void PlaceTile(GameObject tile, GameObject disc)
+    {
+        // temporarily make the tile a child of the disc to get local pos
+        tile.GetComponent<Transform>().SetParent(disc.transform);
+        tile.GetComponent<Rigidbody>().isKinematic = true;
+        tile.GetComponent<Rigidbody>().useGravity = false;
+
+        Vector2 pos = GetTileIndex(tile, disc);
+
+        // Check if that cell is full
+        // if it is, don't place the tile, break
+
+        Vector3 dist = GetCellCenter(pos);
+
+        tile.GetComponent<Transform>().localPosition = dist;
+        tile.GetComponent<Transform>().rotation = disc.transform.rotation;
+    }
+
+
+}
+
+    public class Disc
+    {
+        public int ID;
+
+    }
+
+    // Dict to hold all discs based on a specific ID
+
     
 
     public class Tile
