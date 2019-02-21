@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ifTile : Tile
+public class ifTile : DiscHandler.Tile
 {
     public int type;
     private string[] types = new string[] { "less than", "greater than", "less than or equal", "greater than or equal", "equal", "not equal" };

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class switchTile : Tile
+public class switchTile : DiscHandler.Tile
 {
     public bool inversion;
 

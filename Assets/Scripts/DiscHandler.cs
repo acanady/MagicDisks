@@ -11,23 +11,24 @@ using UnityEngine;
  * on the disc. */
 public class DiscHandler : MonoBehaviour
 {
-    public struct signal
-    {
-        public int element; //Type of element
-        public int units; //The amount of element being passed through
-        public int inout; //0 for input 1 for output
-
-        public signal(int elem, int uni, int ino)
-        {
-            element = elem;
-            units = uni;
-            inout = ino;
-
-        }
-    }
-
+   
     public class Tile
     {
+        public struct signal
+        {
+            public int element; //Type of element
+            public int units; //The amount of element being passed through
+            public int inout; //0 for input 1 for output
+
+            public signal(int elem, int uni, int ino)
+            {
+                element = elem;
+                units = uni;
+                inout = ino;
+
+            }
+        }
+
 
         //The Tile uses data from the signal struct in order to create the tile
 
@@ -113,7 +114,7 @@ public class DiscHandler : MonoBehaviour
 
     void makeDisc(int size)
     {
-        Disc newDisc = new Disc(size);
+        Disc newDisc = new Disc();
         ID = Random.Range(00000, 99999);
         while (Discs.ContainsKey(ID))
         {
@@ -129,7 +130,7 @@ public class DiscHandler : MonoBehaviour
         ID = Random.Range(0, 100);
         while (Tiles.ContainsKey(ID))
         {
-            ID = Random.Range(0, 100);
+            ID = Random.Range(0, 1000);
             Debug.Log("Getting new ID for tile");
         }
         newTile.ID = ID;
@@ -141,14 +142,14 @@ public class DiscHandler : MonoBehaviour
     {
         Disc disc = Discs[dID];
         // have each tile update what it's connected to
-        for (int i = 0; i < disc.tiles.length; i++)
+       /* for (int i = 0; i < disc.tiles.length; i++)
         {
             for (int j = 0; j < disc.tiles[i].length; j++)
             {
                 //Update the tile here
 
             }
-        }
+        }*/
     }
 
     Vector2 GetTileIndex(GameObject tile, GameObject disc)
@@ -199,6 +200,10 @@ public class DiscHandler : MonoBehaviour
         {
             arX = 8;
         }
+        else
+        {
+            arX = 100; //In this case something went wrong, this should never be 100
+        }
 
         // get z
         if (z < (scale / 9) && z > -(scale / 9))
@@ -236,6 +241,10 @@ public class DiscHandler : MonoBehaviour
         else if (z < -7 * (scale / 9) && z > -9 * (scale / 9))
         {
             arZ = 8;
+        }
+        else
+        {
+            arZ = 100; //this should never be true, if it is then something went wrong
         }
 
         Vector2 arPos = new Vector2(arX, arZ);
@@ -319,8 +328,11 @@ public class DiscHandler : MonoBehaviour
     // RemoveTile: Disconnects a Tile from the board, 
     //             Edits the disc array of tiles
     //             Attachs tile to controller
-    void RemoveTile(GameObject tile, GameObject disc, Transform conTrans)
+    public void RemoveTile(GameObject tile, GameObject disc, Transform conTrans)
     {
+        int discID = disc.GetComponent<IDScript>().ID;
+        int tileID = tile.GetComponent<IDScript>().ID;
+
         // Get array position of the tile
         Vector2 pos = GetTileIndex(tile, disc);
         // Use disc function to update the status of the pos in the array
@@ -335,22 +347,44 @@ public class DiscHandler : MonoBehaviour
     //            Determines the corresponding grid position and location in array
     //            If position is empty, disconnect tile from con and place on disk
     //            Else do nothing, maybe flash outline red
-    void PlaceTile(GameObject tile, GameObject disc)
+   public void PlaceTile(GameObject tile, GameObject disc)
     {
+        int discID = disc.GetComponent<IDScript>().ID;
+        int tileID = tile.GetComponent<IDScript>().ID;
+
         // temporarily make the tile a child of the disc to get local pos
         tile.GetComponent<Transform>().SetParent(disc.transform);
         tile.GetComponent<Rigidbody>().isKinematic = true;
         tile.GetComponent<Rigidbody>().useGravity = false;
 
         Vector2 pos = GetTileIndex(tile, disc);
+        int xpos = Mathf.RoundToInt(pos.x);
+        int ypos = Mathf.RoundToInt(pos.y);
 
+        Disc newDisc = new Disc();
+        newDisc = Discs[discID];
         // Check if that cell is full
         // if it is, don't place the tile, break
-
+        if (pos.x == 100 || pos.y == 100)
+        {
+            Debug.LogError("Invalid tile location, position returned values x = " + pos.x + " and y = "+ pos.y + " check GetTileIndex function in DiscHandler");
+        }
+        else if (newDisc.tiles[xpos, ypos] == null)
+        {
+            Debug.Log("Position is null, so a tile can be placed at x-position: " + xpos + " y-position: " + ypos);
+            
+            //The new disc is updated and then will be used to overwrite that ID in disc ID's
+            newDisc.tiles[xpos, ypos] = Tiles[tileID];
+            Discs[discID] = newDisc;
+        }
+        
         Vector3 dist = GetCellCenter(pos);
 
         tile.GetComponent<Transform>().localPosition = dist;
         tile.GetComponent<Transform>().rotation = disc.transform.rotation;
+
+ 
+
     }
 
 
@@ -358,13 +392,23 @@ public class DiscHandler : MonoBehaviour
 
     public class Disc
     {
-        public int ID;
+        public int ID; //ID of that specific disk
+        public DiscHandler.Tile[,] tiles = new DiscHandler.Tile[9, 9]; //2d array for the tile class
+  
+
+        public Disc()
+        {
+            ID = 0;
+        }
+
+        public Disc(int newID)
+        {
+            ID = newID;
+        }
 
     }
 
     // Dict to hold all discs based on a specific ID
-
-    
 
     public class Tile
     {
@@ -373,13 +417,15 @@ public class DiscHandler : MonoBehaviour
             public int element; //Type of element
             public int units; //The amount of element being passed through
             public int inout; //0 for input 1 for output
+            public char prox;//Keeps track of A,B,C,D sides of the tile.
 
-            public signal(int elem, int uni, int ino)
+            public signal(int elem, int uni, int ino, char pro)
             {
                 element = elem;
                 units = uni;
                 inout = ino;
-
+                prox = pro;
+                
             }
         }
 
@@ -399,7 +445,7 @@ public class DiscHandler : MonoBehaviour
 
         public Tile()
         { //Default constructor for the tile 
-            signal_data = new signal(0, 0, 0);
+            signal_data = new signal(0, 0, 0, 'A');
             sides = new Dictionary<string, signal>
         {
             {"up",signal_data },
