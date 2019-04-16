@@ -6,35 +6,107 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelect : MonoBehaviour
 {
-    GameObject controllerRight = GameObject.Find("Controller (right)");
-    GameObject controllerLeft = GameObject.Find("Controller (left)");
-    public SteamVR_TrackedObject myTrackedObjectRight, myTrackedObjectLeft;
-    public SteamVR_Controller.Device rightController, leftController;
     public static bool gamePaused = false;
     public GameObject pauseMenuUI;
+    GameObject[] pauseObjects;
+    private SteamVR_TrackedController controller;
+    private PrimitiveType currPrimitiveType = PrimitiveType.Sphere;
 
-    void Awake()
+    private void OnEnable()
     {
-        myTrackedObjectRight = controllerRight.GetComponent<SteamVR_TrackedObject>();
-        myTrackedObjectLeft = controllerLeft.GetComponent<SteamVR_TrackedObject>();
+        controller = GetComponent<SteamVR_TrackedController>();
+        controller.TriggerClicked += HandleTriggerClicked;
+        controller.PadClicked += HandlePadClicked;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        rightController = SteamVR_Controller.Input((int)myTrackedObjectRight.index);
-        leftController = SteamVR_Controller.Input((int)myTrackedObjectLeft.index);
-        if (rightController.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
-        {
-            if (gamePaused)
-            {
-                resumeGame();
-            }
-            else
-            {
-                pauseGame();
-            }
+        controller.TriggerClicked -= HandleTriggerClicked;
+        controller.PadClicked -= HandlePadClicked;
+    }
 
+    private void HandleTriggerClicked(object sender, ClickedEventArgs e)
+    {
+        SpawnCurrentPrimitiveAtController();
+    }
+
+    private void SpawnCurrentPrimitiveAtController()
+    {
+        var spawnedPrimitive = GameObject.CreatePrimitive(currPrimitiveType);
+        spawnedPrimitive.transform.position = transform.position;
+        spawnedPrimitive.transform.rotation = transform.rotation;
+
+        spawnedPrimitive.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        if (currPrimitiveType == PrimitiveType.Plane)
+        {
+            spawnedPrimitive.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        }
+    }
+
+    private void HandlePadClicked(object sender, ClickedEventArgs e)
+    {
+        if (e.padY < 0)
+        {
+            SelectPreviousPrimitive();
+        }
+        else
+        {
+            SelectNextPrimitive();
+        }
+    }
+
+    private void SelectNextPrimitive()
+    {
+        currPrimitiveType++;
+        if (currPrimitiveType > PrimitiveType.Quad)
+        {
+            currPrimitiveType = PrimitiveType.Sphere;
+        }
+    }
+
+    private void SelectPreviousPrimitive()
+    {
+        currPrimitiveType--;
+        if (currPrimitiveType < PrimitiveType.Sphere)
+        {
+            currPrimitiveType = PrimitiveType.Quad;
+        }
+    }
+
+    void Start()
+    {
+        Time.timeScale = 1;
+        pauseObjects = GameObject.FindGameObjectsWithTag("ShowOnPause");
+        hidePaused();
+    }
+
+    public void pauseControl()
+    {
+        if (Time.timeScale == 1)
+        {
+            Time.timeScale = 0;
+            showPaused();
+        }
+        else if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1;
+            hidePaused();
+        }
+    }
+
+    public void showPaused()
+    {
+        foreach(GameObject g in pauseObjects)
+        {
+            g.SetActive(true);
+        }
+    }
+
+    public void hidePaused()
+    {
+        foreach(GameObject g in pauseObjects)
+        {
+            g.SetActive(false);
         }
     }
 
