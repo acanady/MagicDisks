@@ -50,6 +50,11 @@ public class tile_interact : MonoBehaviour
             ui_south_io.GetComponent<Image>().sprite = tile_south_io.GetComponent<Image>().sprite;
             ui_east_io.GetComponent<Image>().sprite = tile_east_io.GetComponent<Image>().sprite;
             ui_west_io.GetComponent<Image>().sprite = tile_west_io.GetComponent<Image>().sprite;
+
+            tile_north_io.GetComponent<Image>().enabled = true;
+            tile_south_io.GetComponent<Image>().enabled = true;
+            tile_east_io.GetComponent<Image>().enabled = true;
+            tile_west_io.GetComponent<Image>().enabled = true;
         }
     }
 

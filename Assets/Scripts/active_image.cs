@@ -22,7 +22,7 @@ public class active_image : MonoBehaviour
 
     void Update()
     {
-        if (output) //checks if the iamge sprite for this side is set to output if so it chagnes the sprite to be the purple color
+        if (output) //checks if the image sprite for this side is set to output if so it chagnes the sprite to be the purple color
         {
             myimage.sprite = outputIMG;
             isactive = true;
