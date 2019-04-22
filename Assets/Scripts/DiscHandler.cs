@@ -485,4 +485,4 @@ public class DiscHandler : MonoBehaviour
 
     // All tiles and discs will have a single script on them that gives ID
 
-    // Width/Height of Tiles, used for scaling the math
+    // Width/Height of Tiles, used for scaling the math

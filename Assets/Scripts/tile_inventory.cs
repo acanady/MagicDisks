@@ -7,6 +7,9 @@ public class tile_inventory : MonoBehaviour
 {
     public GameObject inventory;
 
+    public AudioClip blop;
+    public AudioSource source;
+
     public bool equals = false; // if equals tile
     public bool less = false; // if less than tile
     public bool great = false; //if greather than tile
@@ -18,9 +21,14 @@ public class tile_inventory : MonoBehaviour
     public bool flow = false; //flow tile
     public bool delete = false; //deletion tile
 
-    
+
     // Update is called once per frame
-  
+
+    void Start()
+    {
+        source.clip = blop;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         //Checks collission for what tile was picked up
@@ -30,60 +38,70 @@ public class tile_inventory : MonoBehaviour
                 print("if equals tile picked up");
                 Destroy(other.gameObject);
                 equals = true;
+                source.Play();
                 break;
 
             case "lessequal":
                 print("less equals tile picked up");
                 Destroy(other.gameObject);
                 less_equals = true;
+                source.Play();
                 break;
 
             case "notequal":
                 print("not equal tile picked up");
                 Destroy(other.gameObject);
                 not_equal = true;
+                source.Play();
                 break;
 
             case "less":
                 print("less than tile picked up");
                 Destroy(other.gameObject);
                 less = true;
+                source.Play();
                 break;
 
             case "greater":
                 print("greter than tile picked up");
                 Destroy(other.gameObject);
                 great = true;
+                source.Play();
                 break;
 
             case "greaterequal":
                 print("grater equals picked up");
                 Destroy(other.gameObject);
                 great_equals = true;
+                source.Play();
                 break;
 
             case "switchon":
                 print("switch on tile picked up");
                 Destroy(other.gameObject);
                 switch_on = true;
+                source.Play();
                 break;
 
             case "switchoff":
                 print("switch off tile picked up");
                 Destroy(other.gameObject);
                 switch_off = true;
+                source.Play();
                 break;
 
             case "flow":
                 print("flow tile picked up");
                 Destroy(other.gameObject);
                 flow = true;
+                source.Play();
                 break;
 
             case "delete":
                 print("delete tile picked up");
                 Destroy(other.gameObject);
                 delete = true;
+                source.Play();
                 break;
 
            default:
