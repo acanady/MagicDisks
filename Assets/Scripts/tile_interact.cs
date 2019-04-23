@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,8 @@ public class tile_interact : MonoBehaviour
     public GameObject tilebag; //tilebag UI
     public GameObject tile; // UI button for the specific tile
     public GameObject discGUI; //The Disc GUI 
+
+    public GameObject Disc; //The disc that the tiles are on
 
     private bool open = false;
     public GameObject tile_east_io;
@@ -71,7 +74,7 @@ public class tile_interact : MonoBehaviour
             {
                 print("tile UI not closed in loop is " + this.name);
             }
-            print(discGUI.transform.GetChild(i).name);
+            //print(discGUI.transform.GetChild(i).name);
         }
 
         if (!open && !selected)
@@ -120,6 +123,7 @@ public class tile_interact : MonoBehaviour
         //boolean value associated with it
         //This value is then used to place the tile. Since selected is set to false immediately after placement and tile_choose sets to
         // false all tiles when selected is false, no more than one tile can be selected at once
+
         equals = tilebag.GetComponent<tile_choose>().sel_equals;
         not_equal = tilebag.GetComponent<tile_choose>().sel_not_equals;
         great_equals = tilebag.GetComponent<tile_choose>().sel_great_equals;
@@ -143,6 +147,12 @@ public class tile_interact : MonoBehaviour
                 print("equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(0).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent <tile_choose>().selected = false;
+                int val_loc = int.Parse(this.name);
+                print("tile location is " + this.name);
+                var arr_loc = array_map(val_loc);
+                print("array location x: " + arr_loc.Item1);
+                print("array location y: " + arr_loc.Item2);
+  
             }
 
             if (not_equal)
@@ -349,5 +359,13 @@ public class tile_interact : MonoBehaviour
         {
             print("TILE IS NULL");
         }
+    }
+
+    //the tile slots have numbers from 0 to 24 it's a 1D array so to speak. This function takes in a number from the 1D array and returns the two array values
+    public Tuple<int,int> array_map(int val)
+    {
+        int x = val / 5;
+        int y = val % 5;
+        return Tuple.Create(x, y);
     }
 }

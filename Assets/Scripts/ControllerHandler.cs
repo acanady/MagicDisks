@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ControllerHandler : MonoBehaviour
 {
-    public DiscHandler discHandler;
+    /*public DiscHandler discHandler;
 
     // Object in a collision
     public GameObject collidingObj;
@@ -39,7 +39,7 @@ public class ControllerHandler : MonoBehaviour
         /* If the grip button is pressed and released,
          * release the object we are currently holding,
          * or, if we aren't holding anything, grab the
-         * object we are touching.*/
+         * object we are touching.
         if (Con.GetPressUp(SteamVR_Controller.ButtonMask.Grip))
         {
             if (collidingObj && !objInHand)
@@ -104,5 +104,5 @@ public class ControllerHandler : MonoBehaviour
         objInHand.GetComponent<Rigidbody>().isKinematic = false;
         objInHand.transform.SetParent(null);
         objInHand = null;
-    }
+    }*/
 }

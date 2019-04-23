@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class switchTile : DiscHandler.Tile
+public class switchTile : Tile
 {
     public bool inversion;
 
@@ -15,7 +15,7 @@ public class switchTile : DiscHandler.Tile
     public switchTile()
     {
         inversion = true;
-        signal_data = new signal(0, 0, 0);
+        signal_data = new signal(0, 0);
         sides = new Dictionary<string, signal>
 
         {
@@ -29,7 +29,7 @@ public class switchTile : DiscHandler.Tile
 
     signal f_switch(switchTile tile, string input, string check_output)
     {
-        signal return_data = new signal(0, 0, 1);
+        signal return_data = new signal(0, 1);
         //given a tile as well as the input and output the switch function will test to see
         //how information will be sent through the tile dependent on the input/output and whether or not
         //inversion is set to true.
@@ -40,7 +40,6 @@ public class switchTile : DiscHandler.Tile
             if (tile.sides[check_output].units > 0 && tile.sides[check_output].inout == 'I')
             {
                 //In this case there is some element passing through the check_output side so we allow the input to be passed through to the output
-                return_data.element = tile.sides[input].element;
                 return_data.inout = 1;
                 return_data.units = tile.sides[input].units;
                 return return_data; //returns the tile data to be assigned to the proper output of the tile in other script.
@@ -57,7 +56,7 @@ public class switchTile : DiscHandler.Tile
             Debug.Log("Tile is inverted");
             if (tile.sides[check_output].units == 0) //Checks to see if there is nothing going through the check output side, checking input and output of this side is unncecessary.
             {
-                return_data.element = tile.sides[input].element;
+                
                 return_data.inout = 1;
                 return_data.units = tile.sides[input].units;
                 return return_data; //returns the tile data to be assigned to the proper output of the tile in other script

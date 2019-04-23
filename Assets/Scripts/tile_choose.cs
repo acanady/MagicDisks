@@ -187,7 +187,7 @@ public class tile_choose : MonoBehaviour
         sel_flow = false;
         sel_delete = false;
 
-        great = controller.gameObject.GetComponent<tile_inventory>().less;
+        great = controller.gameObject.GetComponent<tile_inventory>().great;
         if (great)
         {
             print("greater than tile has been selected");
