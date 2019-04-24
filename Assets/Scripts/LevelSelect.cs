@@ -124,23 +124,8 @@ public class LevelSelect : MonoBehaviour
         gamePaused = true;
     }
 
-    public void quitGame()
-    {
-        Application.Quit();
-    }
-
     public void loadLevel1()
     {
-        SceneManager.LoadScene(2);
-    }
-
-    public void loadLevel2()
-    {
-        SceneManager.LoadScene(3);
-    }
-
-    public void loadLevel3()
-    {
-        SceneManager.LoadScene(4);
+        SceneManager.LoadScene(1);
     }
 }
