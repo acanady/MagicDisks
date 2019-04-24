@@ -41,7 +41,7 @@ public class VRUIInput : MonoBehaviour
         if (button != null)
         {
             button.Select();
-            Debug.Log("HandlePointerIn", e.target.gameObject);
+            //Debug.Log("HandlePointerIn", e.target.gameObject);
         }
     }
 
@@ -51,7 +51,7 @@ public class VRUIInput : MonoBehaviour
         if (button != null)
         {
             EventSystem.current.SetSelectedGameObject(null);
-            Debug.Log("HandlePoitnerOut", e.target.gameObject);
+            //Debug.Log("HandlePoitnerOut", e.target.gameObject);
         }
     }
 }

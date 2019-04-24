@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class tile_choose : MonoBehaviour
 {
-    public Rigidbody controller;
+    public GameObject controller;
     public GameObject DiscGUI;
     public bool selected;
 
