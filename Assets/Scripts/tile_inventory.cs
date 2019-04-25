@@ -20,6 +20,7 @@ public class tile_inventory : MonoBehaviour
     public bool switch_off = false; //switch tile
     public bool flow = false; //flow tile
     public bool delete = false; //deletion tile
+    public bool computer = false; //computer terminal
 
 
     // Update is called once per frame
@@ -101,6 +102,13 @@ public class tile_inventory : MonoBehaviour
                 print("delete tile picked up");
                 Destroy(other.gameObject);
                 delete = true;
+                source.Play();
+                break;
+
+            case "computer":
+                print("terminal access picked up");
+                Destroy(other.gameObject);
+                computer = true;
                 source.Play();
                 break;
 

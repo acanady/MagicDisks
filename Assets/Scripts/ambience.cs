@@ -11,6 +11,7 @@ public class ambience : MonoBehaviour
     void Start()
     {
         music_source.clip = music;
+        Cursor.visible = true;
     }
 
     // Update is called once per frame

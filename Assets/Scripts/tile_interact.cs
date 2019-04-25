@@ -41,6 +41,10 @@ public class tile_interact : MonoBehaviour
     public Sprite inputIMG;
     public Sprite outputIMG;
 
+    public AudioClip click;
+    public AudioClip click2;
+    public AudioSource source;
+
     void Start()
     {
         tile_north_io.GetComponent<Image>().enabled = false;
@@ -57,6 +61,8 @@ public class tile_interact : MonoBehaviour
 
 
         selected = tilebag.GetComponent<tile_choose>().selected;
+
+        source.clip = click;
     }
 
     public void openUI()
@@ -142,6 +148,7 @@ public class tile_interact : MonoBehaviour
 
         if (selected)
         {
+            source.clip = click2;
             if (equals)
             {
                 print("equals tile has been placed");
@@ -152,7 +159,8 @@ public class tile_interact : MonoBehaviour
                 var arr_loc = array_map(val_loc);
                 print("array location x: " + arr_loc.Item1);
                 print("array location y: " + arr_loc.Item2);
-  
+                //source.Play();
+
             }
 
             if (not_equal)
@@ -160,6 +168,24 @@ public class tile_interact : MonoBehaviour
                 print("not equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(1).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
+            }
+
+            if (switch_on)
+            {
+                print("switch on tile has been placed");
+                tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(6).gameObject.GetComponent<Image>().sprite;
+                tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
+
+            }
+
+            if (switch_off)
+            {
+                print("switch off tile has been placed");
+                tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(7).gameObject.GetComponent<Image>().sprite;
+                tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (great_equals)
@@ -168,6 +194,7 @@ public class tile_interact : MonoBehaviour
                 print("greater than equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(2).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (less_equals)
@@ -175,6 +202,7 @@ public class tile_interact : MonoBehaviour
                 print("less than equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(3).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (less)
@@ -182,6 +210,7 @@ public class tile_interact : MonoBehaviour
                 print("less than tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(4).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (great)
@@ -189,6 +218,7 @@ public class tile_interact : MonoBehaviour
                 print("greater than tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(5).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (flow)
@@ -196,6 +226,7 @@ public class tile_interact : MonoBehaviour
                 print("flow tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(8).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
 
             if (delete)
@@ -203,12 +234,15 @@ public class tile_interact : MonoBehaviour
                 print("delete tile selected");
                 tile.gameObject.GetComponent<Image>().sprite = noputIMG;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                //source.Play();
             }
         }
     }
 
     public void setNorthIO()
     {
+        source.clip = click;
+        source.Play();
         if (ui_north_io != null)
         {
             if(ui_north_io.GetComponent<Image>().sprite.name == "noput")
@@ -245,8 +279,11 @@ public class tile_interact : MonoBehaviour
 
     public void setSouthIO()
     {
+        source.clip = click;
+        source.Play();
         if (ui_south_io != null)
         {
+            
             //if the current sprite name set for the south side is noput then it cycles it to input and sets the
             //input/output image of the tile
             if (ui_south_io.GetComponent<Image>().sprite.name == "noput")
@@ -291,6 +328,8 @@ public class tile_interact : MonoBehaviour
 
     public void setEastIO()
     {
+        source.clip = click;
+        source.Play();
         if (ui_east_io != null)
         {
             if (ui_east_io.GetComponent<Image>().sprite.name == "noput")
@@ -327,6 +366,8 @@ public class tile_interact : MonoBehaviour
 
     public void setWestIO()
     {
+        source.clip = click;
+        source.Play();
         if (ui_west_io != null)
         {
             if (ui_west_io.GetComponent<Image>().sprite.name == "noput")

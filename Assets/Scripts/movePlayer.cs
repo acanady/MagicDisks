@@ -7,6 +7,7 @@ public class movePlayer : MonoBehaviour
 {
     [SerializeField]
     private Transform rig;
+    public int speed;
 
     private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
 
@@ -37,7 +38,7 @@ public class movePlayer : MonoBehaviour
             axis = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             if (rig != null)
             {
-                rig.position += (transform.right * axis.x + transform.forward * axis.y) * Time.deltaTime;
+                rig.position += (transform.right * axis.x + transform.forward * axis.y) * Time.deltaTime * speed;
                 rig.position = new Vector3(rig.position.x, 0, rig.position.z);
             }
         }

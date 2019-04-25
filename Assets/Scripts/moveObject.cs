@@ -5,7 +5,7 @@ using UnityEngine;
 public class moveObject : MonoBehaviour
 {
     GameObject heldObject;
-    RaycastHit hit;
+    //RaycastHit hit;
     bool carrying = false;
     bool pickup = false;
    
@@ -13,7 +13,7 @@ public class moveObject : MonoBehaviour
     void Update()
     {
         
-        if (carrying && pickup)
+       /* if (carrying && pickup)
         {
             carry(heldObject);
         }
@@ -58,6 +58,6 @@ public class moveObject : MonoBehaviour
     {
         Rigidbody rb = carrier.GetComponent<Rigidbody>();
         carrying = false;
-        rb.isKinematic = false;
+        rb.isKinematic = false;*/
     }
 }
