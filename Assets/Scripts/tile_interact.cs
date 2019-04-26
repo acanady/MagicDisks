@@ -10,10 +10,24 @@ public class tile_interact : MonoBehaviour
     public GameObject tilebag; //tilebag UI
     public GameObject tile; // UI button for the specific tile
     public GameObject discGUI; //The Disc GUI 
+    public GameObject signalUI; //The UI that dictates the signal of the tile
+
+
+    //Settings derived from tile interat that are used to create the tile object in the DiscHandler class
+    public int signal_strength; //The strength of the signal tile
+    public Tile.tile_location location; //The location of the tile on the board it's a struct with an i and a j value
+    public string tile_type; //The string for the type of tile they are flow,if,and switch
+    public Tile.signal tile_signal; //The signal for the tile at this location
+    public Tile.signal signal_data; //used to initalize signal data for the tile
+    public Dictionary<string, Tile.signal> sides; //sets up the signals for the tile location
+    public int tile_if_type = 0; //the type of the if tile
+
+
 
     public GameObject Disc; //The disc that the tiles are on
 
     private bool open = false;
+    
     public GameObject tile_east_io;
     public GameObject tile_west_io;
     public GameObject tile_south_io;
@@ -47,6 +61,17 @@ public class tile_interact : MonoBehaviour
 
     void Start()
     {
+        signal_data = new Tile.signal(0, -1);
+        sides = new Dictionary<string, Tile.signal>
+        {
+            {"north",signal_data},
+            { "south",signal_data},
+            { "west",signal_data},
+            { "east",signal_data},
+        };
+
+        print("hello inside the tile_interact script");
+
         tile_north_io.GetComponent<Image>().enabled = false;
         tile_south_io.GetComponent<Image>().enabled = false;
         tile_east_io.GetComponent<Image>().enabled = false;
@@ -63,6 +88,21 @@ public class tile_interact : MonoBehaviour
         selected = tilebag.GetComponent<tile_choose>().selected;
 
         source.clip = click;
+
+        if (this.name == "11")
+        {
+            location = array_map(11);
+        }
+
+        if (this.name == "13")
+        {
+            location = array_map(13);
+        }
+
+        if (this.name == "17")
+        {
+            location = array_map(17);
+        }
     }
 
     public void openUI()
@@ -86,12 +126,16 @@ public class tile_interact : MonoBehaviour
         if (!open && !selected)
         {
             UI.SetActive(true);
+            if(signalUI != null)
+            signalUI.SetActive(true);
             open = true;
  
         }
         else
         {
             UI.SetActive(false);
+            if (signalUI != null)
+            signalUI.SetActive(false);
             open = false;
         }
         
@@ -146,19 +190,28 @@ public class tile_interact : MonoBehaviour
 
        // print("clicked on the button fam");
 
+       
+
         if (selected)
         {
+            //prints out the information for the tile when selected
+            int val_loc = int.Parse(this.name);
+            location = array_map(val_loc);
+            print("tile location is " + this.name);
+            print("array location x: " + location.i);
+            print("array location y: " + location.j);
+
             source.clip = click2;
             if (equals)
             {
                 print("equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(0).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent <tile_choose>().selected = false;
-                int val_loc = int.Parse(this.name);
-                print("tile location is " + this.name);
-                var arr_loc = array_map(val_loc);
-                print("array location x: " + arr_loc.Item1);
-                print("array location y: " + arr_loc.Item2);
+                
+                //sets the tile type and the if tile type for creation of the tile itself at that location in the DiscHandler
+                tile_type = "if";
+                tile_if_type = 4;
+
                 //source.Play();
 
             }
@@ -168,6 +221,8 @@ public class tile_interact : MonoBehaviour
                 print("not equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(1).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                tile_type = "if";
+                tile_if_type = 5;
                 //source.Play();
             }
 
@@ -194,6 +249,8 @@ public class tile_interact : MonoBehaviour
                 print("greater than equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(2).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                tile_type = "if";
+                tile_if_type = 3;
                 //source.Play();
             }
 
@@ -202,6 +259,8 @@ public class tile_interact : MonoBehaviour
                 print("less than equals tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(3).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                tile_type = "if";
+                tile_if_type = 2;
                 //source.Play();
             }
 
@@ -210,6 +269,8 @@ public class tile_interact : MonoBehaviour
                 print("less than tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(4).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                tile_type = "if";
+                tile_if_type = 0;
                 //source.Play();
             }
 
@@ -218,6 +279,8 @@ public class tile_interact : MonoBehaviour
                 print("greater than tile has been placed");
                 tile.gameObject.GetComponent<Image>().sprite = tilebag.transform.GetChild(5).gameObject.GetComponent<Image>().sprite;
                 tilebag.GetComponent<tile_choose>().selected = false;
+                tile_type = "if";
+                tile_if_type = 1;
                 //source.Play();
             }
 
@@ -250,6 +313,10 @@ public class tile_interact : MonoBehaviour
                 ui_north_io.GetComponent<Image>().sprite = inputIMG;
                 tile_north_io.GetComponent<Image>().sprite = ui_north_io.GetComponent<Image>().sprite;
                 tile_north_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently inputing from the tile so we set the north side input to 0
+                tile_signal = new Tile.signal(signal_strength, 0);
+                sides["north"] = tile_signal;
             }
 
             else if (ui_north_io.GetComponent<Image>().sprite.name == "input")
@@ -257,6 +324,10 @@ public class tile_interact : MonoBehaviour
                 ui_north_io.GetComponent<Image>().sprite = outputIMG;
                 tile_north_io.GetComponent<Image>().sprite = ui_north_io.GetComponent<Image>().sprite;
                 tile_north_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently outputing form the tile so we set the north side input to 1
+                tile_signal = new Tile.signal(signal_strength, 1);
+                sides["north"] = tile_signal;
             }
 
             else if (ui_north_io.GetComponent<Image>().sprite.name == "output")
@@ -264,6 +335,11 @@ public class tile_interact : MonoBehaviour
                 ui_north_io.GetComponent<Image>().sprite = noputIMG;
                 tile_north_io.GetComponent<Image>().sprite = ui_north_io.GetComponent<Image>().sprite;
                 tile_north_io.GetComponent<Image>().enabled = false;
+
+                //in this case we have no output or input so we set north side input to -1
+
+                tile_signal = new Tile.signal(signal_strength, -1);
+                sides["north"] = tile_signal;
             }
             else
             {
@@ -291,6 +367,10 @@ public class tile_interact : MonoBehaviour
                 ui_south_io.GetComponent<Image>().sprite = inputIMG;
                 tile_south_io.GetComponent<Image>().sprite = ui_south_io.GetComponent<Image>().sprite;
                 tile_south_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently inputing from the tile so we set the south side input to 0
+                tile_signal = new Tile.signal(signal_strength, 0);
+                sides["south"] = tile_signal;
             }
 
             //if the current sprite name set for the south side is input then it cycles it to output and sets the
@@ -300,6 +380,10 @@ public class tile_interact : MonoBehaviour
                 ui_south_io.GetComponent<Image>().sprite = outputIMG;
                 tile_south_io.GetComponent<Image>().sprite = ui_south_io.GetComponent<Image>().sprite;
                 tile_south_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently outputing form the tile so we set the south side input to 1
+                tile_signal = new Tile.signal(signal_strength, 1);
+                sides["south"] = tile_signal;
             }
 
             //if the current sprite name set for the south side is output then it cycles it to noput and sets the
@@ -309,6 +393,11 @@ public class tile_interact : MonoBehaviour
                 ui_south_io.GetComponent<Image>().sprite = noputIMG;
                 tile_south_io.GetComponent<Image>().sprite = ui_south_io.GetComponent<Image>().sprite;
                 tile_south_io.GetComponent<Image>().enabled = false;
+
+                //in this case we have no output or input so we set south side input to -1
+
+                tile_signal = new Tile.signal(signal_strength, -1);
+                sides["south"] = tile_signal;
             }
 
             //error detection
@@ -337,6 +426,10 @@ public class tile_interact : MonoBehaviour
                 ui_east_io.GetComponent<Image>().sprite = inputIMG;
                 tile_east_io.GetComponent<Image>().sprite = ui_east_io.GetComponent<Image>().sprite;
                 tile_east_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently inputing from the tile so we set the east side input to 0
+                tile_signal = new Tile.signal(signal_strength, 0);
+                sides["east"] = tile_signal;
             }
 
             else if (ui_east_io.GetComponent<Image>().sprite.name == "input")
@@ -344,6 +437,10 @@ public class tile_interact : MonoBehaviour
                 ui_east_io.GetComponent<Image>().sprite = outputIMG;
                 tile_east_io.GetComponent<Image>().sprite = ui_east_io.GetComponent<Image>().sprite;
                 tile_east_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently outputing form the tile so we set the east side input to 1
+                tile_signal = new Tile.signal(signal_strength, 1);
+                sides["east"] = tile_signal;
             }
 
             else if (ui_east_io.GetComponent<Image>().sprite.name == "output")
@@ -351,6 +448,11 @@ public class tile_interact : MonoBehaviour
                 ui_east_io.GetComponent<Image>().sprite = noputIMG;
                 tile_east_io.GetComponent<Image>().sprite = ui_east_io.GetComponent<Image>().sprite;
                 tile_east_io.GetComponent<Image>().enabled = false;
+
+                //in this case we have no output or input so we set east side input to -1
+
+                tile_signal = new Tile.signal(signal_strength, -1);
+                sides["east"] = tile_signal;
             }
             else
             {
@@ -375,6 +477,10 @@ public class tile_interact : MonoBehaviour
                 ui_west_io.GetComponent<Image>().sprite = inputIMG;
                 tile_west_io.GetComponent<Image>().sprite = ui_west_io.GetComponent<Image>().sprite;
                 tile_west_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently inputing from the tile so we set the west side input to 0
+                tile_signal = new Tile.signal(signal_strength, 0);
+                sides["west"] = tile_signal;
             }
 
             else if (ui_west_io.GetComponent<Image>().sprite.name == "input")
@@ -382,13 +488,23 @@ public class tile_interact : MonoBehaviour
                 ui_west_io.GetComponent<Image>().sprite = outputIMG;
                 tile_west_io.GetComponent<Image>().sprite = ui_west_io.GetComponent<Image>().sprite;
                 tile_west_io.GetComponent<Image>().enabled = true;
+
+                //in this case we're currently outputing form the tile so we set the weest side input to 1
+                tile_signal = new Tile.signal(signal_strength, 1);
+                sides["west"] = tile_signal;
             }
+
 
             else if (ui_west_io.GetComponent<Image>().sprite.name == "output")
             {
                 ui_west_io.GetComponent<Image>().sprite = noputIMG;
                 tile_west_io.GetComponent<Image>().sprite = ui_west_io.GetComponent<Image>().sprite;
                 tile_west_io.GetComponent<Image>().enabled = false;
+
+                //in this case we have no output or input so we set west side input to -1
+
+                tile_signal = new Tile.signal(signal_strength, -1);
+                sides["west"] = tile_signal;
             }
             else
             {
@@ -402,11 +518,127 @@ public class tile_interact : MonoBehaviour
         }
     }
 
-    //the tile slots have numbers from 0 to 24 it's a 1D array so to speak. This function takes in a number from the 1D array and returns the two array values
-    public Tuple<int,int> array_map(int val)
+    public void signal1()
     {
+        Sprite signal1 = signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite;
+        Sprite signal2 = signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite;
+        Sprite signal3 = signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite;
+
+        //so if the sprite there is the ouputIMG, the purple one then a signal has been set for that tile already
+        if (signal1.name == outputIMG.name)
+        {
+            signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = noputIMG;
+            signal_strength = 0;
+
+            //After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+        }
+
+        //similar, it swpas the image and resets the signal strenth
+        if(signal1.name == noputIMG.name)
+        {
+            signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signal_strength = 1;
+
+            //After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+        }
+
+        //Also if the other tiles UI needs to be set to noputIMG;
+        signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = noputIMG;
+        signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite = noputIMG;
+
+    }
+
+    public void signal2()
+    {
+        Sprite signal2 = signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite;
+
+        if (signal2.name == outputIMG.name)
+        {
+            signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = noputIMG;
+            //signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = noputIMG;
+            signal_strength = 1;
+
+            ///After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+        }
+
+        if(signal2.name == noputIMG.name)
+        {
+            signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signal_strength = 2;
+
+            //After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+
+        }
+
+        signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite = noputIMG;
+
+
+    }
+
+    public void signal3()
+    {
+        Sprite signal3 = signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite;
+
+        if(signal3.name == outputIMG.name)
+        {
+            signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite = noputIMG;
+            signal_strength = 2;
+
+            //After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+        }
+
+        if(signal3.name == noputIMG.name)
+        {
+            signalUI.transform.GetChild(2).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signalUI.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signalUI.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = outputIMG;
+            signal_strength = 3;
+
+            //After updating the signal strength every side of the tile has it's signal strength changed to match
+            sides["north"] = new Tile.signal(signal_strength, sides["north"].inout);
+            sides["south"] = new Tile.signal(signal_strength, sides["south"].inout);
+
+            sides["east"] = new Tile.signal(signal_strength, sides["east"].inout);
+            sides["west"] = new Tile.signal(signal_strength, sides["west"].inout);
+        }
+    }
+    //the tile slots have numbers from 0 to 24 it's a 1D array so to speak. This function takes in a number from the 1D array and returns the two array values
+    public Tile.tile_location array_map(int val)
+    {
+        Tile.tile_location my_loc;
         int x = val / 5;
         int y = val % 5;
-        return Tuple.Create(x, y);
+
+        my_loc.i = x;
+        my_loc.j = y;
+
+        return my_loc;
+
     }
 }

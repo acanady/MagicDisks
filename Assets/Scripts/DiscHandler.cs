@@ -12,16 +12,51 @@ using UnityEngine;
 public class DiscHandler : MonoBehaviour
 {
 
-    public class Disc
+    public GameObject vrcontroller;
+    public bool cycle = true;
+    public GameObject discGUI; //The GUI for the discs so that the disc handler can properly hand the tiles
+    public GameObject passedGUI; //The all green GUI that shows when the puzzle has been solved
+    public Tile[,] tiles;
+    public Tile.signal signal_data;
+    public Dictionary<string, Tile.signal> sides;
+    public AudioClip hurrah;
+    public AudioSource hurrah_source;
+
+    int ID;
+    //Dict to hold all tiles based on a specific ID
+    Dictionary<int, Tile> Tiles;
+
+    SteamVR_TrackedController controller;
+
+    void Start()
     {
+        controller = vrcontroller.GetComponent<SteamVR_TrackedController>();
+        Tiles = new Dictionary<int, Tile>();
+        tiles = new Tile[5, 5]; //2d array for the tile class
 
-        public Tile[,] tiles = new Tile[5, 5]; //2d array for the tile class
+        signal_data = new Tile.signal(0, -1);
+        sides = new Dictionary<string, Tile.signal>
+        {
+            {"north",signal_data},
+            { "south",signal_data},
+            { "west",signal_data},
+            { "east",signal_data},
+        };
 
-        int ID;
-        //Dict to hold all tiles based on a specific ID
-        Dictionary<int, Tile> Tiles = new Dictionary<int, Tile>();
+        hurrah_source.clip = hurrah;
+    }
 
-        void makeTile()
+    void Update()
+    {
+        if (controller.gripped)
+        {
+            //print("i have been gripped");
+            demo_data_flow();
+        }
+
+    }
+
+    void makeTile()
         //makes a default tile, the north south east and west sides are empty
         //sets a random tile ID from 0 to 1000 and puts it into the tile dictionary with that ID;
         //When a tile is removed this ID must be removed from the Dictionary
@@ -40,28 +75,96 @@ public class DiscHandler : MonoBehaviour
 
         }
 
-        void data_flow(Tile start) //Perhaps the most important function, it's what iterates through all connected tiles it needs only to be given a start tile
-        {
-            
-            //it flows the data of the tile given to whatever tiles are the output tiles
-            //if the north side is set to output
-            if (start.sides["north"].inout == 1)
-            {
-                //if the child tile that is opposite to the output is inputing, then push that data through
-                if(check_opposite(tiles[child_location(start.tile_loc,"north").i, child_location(start.tile_loc, "north").j], "north"))
-                {
-                    //check to see if the tile being pushed to is a flow tile, if so we just overwrite the signal data on all sides that aren't the one input side
-                }
+    /* void data_flow(Tile start) //Perhaps the most important function, it's what iterates through all connected tiles it needs only to be given a start tile
+     {
 
+         //it flows the data of the tile given to whatever tiles are the output tiles
+         //if the north side is set to output
+         if (start.sides["north"].inout == 1)
+         {
+             //if the child tile that is opposite to the output is inputing, then push that data through
+             if(check_opposite(tiles[child_location(start.tile_loc,"north").i, child_location(start.tile_loc, "north").j], "north"))
+             {
+                 //check to see if the tile being pushed to is a flow tile, if so we just overwrite the signal data on all sides that aren't the one input side
+             }
+
+         }
+     }*/
+
+    void demo_data_flow()
+    {
+
+        if (cycle)
+        {
+            //initializes the disc with the appropriate tiles, in face it will do this constanlty on void_update
+
+            demo_disc_initialize();
+
+            //Code for flow tile in locaiton 11
+            Tile tile11 = tiles[2, 1];
+            Tile tile12 = tiles[2, 2];
+            Tile tile13 = tiles[2, 3];
+            Tile tile17 = tiles[3, 2];
+
+
+            if (tile11.sides["east"].inout == 1)
+            {
+                //checks to see if the tile12 is accepting relative to tile 11's east side
+                if (check_opposite(tile12, "east"))
+                {
+
+                    //creates a new signal for tile 12 whose units from the east are the units pased in by the flow tile
+                    Tile.signal signal_change = new Tile.signal(tile11.sides["east"].units, tile12.sides["west"].inout);
+                    print("changing tile 12's units on the west side to be " + signal_change.units);
+                    tile12.sides["west"] = signal_change;
+                }
             }
+
+            if (tile13.sides["west"].inout == 1)
+            {
+                if (check_opposite(tile12, "west"))
+                {
+
+                    Tile.signal signal_change = new Tile.signal(tile13.sides["west"].units, tile12.sides["east"].inout);
+                    print("changing tile 12's units on the east side to be " + signal_change.units);
+                    tile12.sides["east"] = signal_change;
+                }
+            }
+
+            Tile.signal if_signal = tile12.ifthen(tile12, "west", "east", "north");
+            //so if the tile at tile 12 is outputting
+            if (tile12.sides["south"].inout == 1)
+            {
+                //If the signal relative to the south tile on tile 17 is accepting
+                if (check_opposite(tile17, "south"))
+                {
+                    //sets tile 17's output to 1 Recall that tile 17's output cannot be changed in any other way
+                    Tile.signal signal_change = new Tile.signal(if_signal.units, tile17.sides["north"].inout);
+                    tile17.sides["north"] = signal_change;
+                }
+            }
+
+            tile17.print_tile(17);
+            if (tile17.sides["north"].units == 1)
+            {
+                print("tile 17 has properly recieved data puzzle solved!");
+                cycle = false;
+                discGUI.SetActive(false);
+                passedGUI.SetActive(true);
+                hurrah_source.Play();
+            }
+
         }
+
+
+    }
 
         //Checks if the side oppossite to the parents side is set to input, if so it returns true
         bool check_opposite(Tile child_tile, string parent_side)
         {
             string ct_side = opposite_io(parent_side); //child tile oppossite side of parent_side
 
-            if(child_tile.sides[ct_side].inout == 0) //If the oppossite end of the child tile from the parent tile is set to accept input
+            if (child_tile.sides[ct_side].inout == 0) //If the oppossite end of the child tile from the parent tile is set to accept input
             {
                 return true;
             }
@@ -71,6 +174,37 @@ public class DiscHandler : MonoBehaviour
                 return false;
             }
         }
+
+    //ideally it initalizes the entire disc setting each tile to the proper values based on the tile_interact script. However, for this demo, it only does this for 4 tiles
+    void demo_disc_initialize()
+        {
+        Tile.tile_location location;
+        Dictionary<string, Tile.signal> sides;
+        int iftype;
+        string tile_type;
+
+        for (int i = 11; i < 18; i++)
+        {
+            if (i == 11 || i == 12 || i == 13 || i == 17)
+            {
+                //since this is a demo it will only populate the board with tiles at locations 11, 12, 13, and 17
+                location = discGUI.transform.GetChild(i).GetComponent<tile_interact>().location;
+                print("tile location for tile " + i + " i: " + location.i + " tile location j: " + location.j);
+
+                sides = discGUI.transform.GetChild(i).GetComponent<tile_interact>().sides;
+                iftype = discGUI.transform.GetChild(i).GetComponent<tile_interact>().tile_if_type;
+                tile_type = discGUI.transform.GetChild(i).GetComponent<tile_interact>().tile_type;
+
+                Tile my_tile = new Tile(sides, iftype, tile_type, location);
+                //print("tile " + i + " input output");
+                //my_tile.print_tile(i);
+
+                //sets the board at that location to that particular tile
+                tiles[location.i, location.j] = my_tile;
+            }
+
+        }
+    }
 
         //returns the oppossite side given the name of the side.
         string opposite_io(string side)
@@ -100,18 +234,21 @@ public class DiscHandler : MonoBehaviour
         }
 
         //returns the location of the child tile
-        Tile.tile_location child_location(Tile.tile_location parent_location, string side)
+        Tile child_tile_find(Tile.tile_location parent_location, string side)
         {
             //given a side it returns the location of the child, if it does not exist. I.E out of bounds, it returns null
             Tile.tile_location child_loc = new Tile.tile_location(0, 0);
+            Tile child_tile = null;
             int x = parent_location.i;
             int y = parent_location.j;
             switch (side)
             {
                 case "north":
-                    if (tiles[x - 1, y] != null) {
+                    if (tiles[x - 1, y] != null)
+                    {
                         child_loc.i = x - 1;
                         child_loc.j = y;
+                        child_tile = tiles[child_loc.i, child_loc.j];
                     }
                     else
                     {
@@ -119,322 +256,47 @@ public class DiscHandler : MonoBehaviour
                     }
                     break;
                 case "south":
-                    if(tiles[x+1, y] != null)
+                    if (tiles[x + 1, y] != null)
                     {
                         child_loc.i = x + 1;
                         child_loc.j = y;
+                        child_tile = tiles[child_loc.i, child_loc.j];
                     }
                     else
                     {
-                        print("attempting to access invalid tile space, no tile at " + (x+1) + "," + y);
+                        print("attempting to access invalid tile space, no tile at " + (x + 1) + "," + y);
                     }
                     break;
                 case "east":
-                    if(tiles[x, y+1] != null)
+                    if (tiles[x, y + 1] != null)
                     {
                         child_loc.i = x;
                         child_loc.j = y + 1;
+                        child_tile = tiles[child_loc.i, child_loc.j];
                     }
                     else
                     {
-                        print("attempting to access invalid tile space, no tile at " + x + "," + (y+1));
+                        print("attempting to access invalid tile space, no tile at " + x + "," + (y + 1));
                     }
                     break;
                 case "west":
-                    if(tiles[x,y-1] != null)
+                    if (tiles[x, y - 1] != null)
                     {
                         child_loc.i = x;
                         child_loc.j = y - 1;
+                        child_tile = tiles[child_loc.i, child_loc.j];
                     }
                     else
                     {
-                        print("attempting to access invalid tile space, no tile at " + x + "," + (y-1));
+                        print("attempting to access invalid tile space, no tile at " + x + "," + (y - 1));
                     }
                     break;
                 default:
                     break;
             }
 
-            return child_loc;
+            return child_tile;
         }
+ }
 
-        // Float for making new IDs
-
-
-
-        // All tiles and discs will have a single script on them that gives ID
-
-        // Width/Height of Tiles, used for scaling the math
-        //float TileSize;
-
-        // Dict to hold all discs
-        //Dictionary<int, Disc> Discs = new Dictionary<int, Disc>();
-
-
-        // ----[Disc Class Goes Here]----
-
-
-
-        /*
-        // Call when 'compiling' the disc; dID = disc ID
-        void UpdateDisc(int dID)
-        {
-            Disc disc = Discs[dID];
-            // have each tile update what it's connected to
-            for (int i = 0; i < disc.tiles.length; i++)
-            {
-                for (int j = 0; j < disc.tiles[i].length; j++)
-                {
-                    //Update the tile here
-
-                }
-            }
-        }
-
-        Vector2 GetTileIndex(GameObject tile, GameObject disc)
-        {
-            Vector3 pos = new Vector3(0f, 0f, 0f);
-            pos = tile.GetComponent<Transform>().localPosition;
-
-            float x = pos.x;
-            int arX = 9;
-            float z = pos.z;
-            int arZ = 9;
-            float scale = TileSize * 4.5f;
-
-            // get x
-            if (x < (scale / 9) && x > -(scale / 9))
-            {
-                arX = 4;
-            }
-            else if (x < 3*(scale / 9) && x > (scale / 9))
-            {
-                arX = 3;
-            }
-            else if (x < 5*(scale / 9) && x > 3*(scale / 9))
-            {
-                arX = 2;
-            }
-            else if (x < 7*(scale / 9) && x > 5*(scale / 9))
-            {
-                arX = 1;
-            }
-            else if (x < 9*(scale / 9) && x > 7*(scale / 9))
-            {
-                arX = 0;
-            }
-            else if (x < -(scale / 9) && x > -3*(scale / 9))
-            {
-                arX = 5;
-            }
-            else if (x < -3*(scale / 9) && x > -5*(scale / 9))
-            {
-                arX = 6;
-            }
-            else if (x < -5*(scale / 9) && x > -7*(scale / 9))
-            {
-                arX = 7;
-            }
-            else if (x < -7*(scale / 9) && x > -9*(scale / 9))
-            {
-                arX = 8;
-            }
-            else
-            {
-                arX = 100; //In this case something went wrong, this should never be 100
-            }
-
-            // get z
-            if (z < (scale / 9) && z > -(scale / 9))
-            {
-                arZ = 4;
-            }
-            else if (z < 3 * (scale / 9) && z > (scale / 9))
-            {
-                arZ = 3;
-            }
-            else if (z < 5 * (scale / 9) && z > 3 * (scale / 9))
-            {
-                arZ = 2;
-            }
-            else if (z < 7 * (scale / 9) && z > 5 * (scale / 9))
-            {
-                arZ = 1;
-            }
-            else if (z < 9 * (scale / 9) && z > 7 * (scale / 9))
-            {
-                arZ = 0;
-            }
-            else if (z < -(scale / 9) && z > -3 * (scale / 9))
-            {
-                arZ = 5;
-            }
-            else if (z < -3 * (scale / 9) && z > -5 * (scale / 9))
-            {
-                arZ = 6;
-            }
-            else if (z < -5 * (scale / 9) && z > -7 * (scale / 9))
-            {
-                arZ = 7;
-            }
-            else if (z < -7 * (scale / 9) && z > -9 * (scale / 9))
-            {
-                arZ = 8;
-            }
-            else
-            {
-                arZ = 100; //this should never be true, if it is then something went wrong
-            }
-
-            Vector2 arPos = new Vector2(arX, arZ);
-            return arPos;
-        }
-
-        Vector3 GetCellCenter(Vector2 index)
-        {
-            int x = Mathf.RoundToInt(index.x);
-            int z = Mathf.RoundToInt(index.y);
-
-            float h = 0f;
-            float w = 0f;
-
-            switch (x)
-            {
-                case 0:
-                    h = 8 * (TileSize / 9);
-                    break;
-                case 1:
-                    h = 6 * (TileSize / 9);
-                    break;
-                case 2:
-                    h = 4 * (TileSize / 9);
-                    break;
-                case 3:
-                    h = 2 * (TileSize / 9);
-                    break;
-                case 4:
-                    h = 0f;
-                    break;
-                case 5:
-                    h = -2 * (TileSize / 9);
-                    break;
-                case 6:
-                    h = -4 * (TileSize / 9);
-                    break;
-                case 7:
-                    h = -6 * (TileSize / 9);
-                    break;
-                case 8:
-                    h = -8 * (TileSize / 9);
-                    break;
-            }
-
-            switch (z)
-            {
-                case 0:
-                    w = 8 * (TileSize / 9);
-                    break;
-                case 1:
-                    w = 6 * (TileSize / 9);
-                    break;
-                case 2:
-                    w = 4 * (TileSize / 9);
-                    break;
-                case 3:
-                    w = 2 * (TileSize / 9);
-                    break;
-                case 4:
-                    w = 0f;
-                    break;
-                case 5:
-                    w = -2 * (TileSize / 9);
-                    break;
-                case 6:
-                    w = -4 * (TileSize / 9);
-                    break;
-                case 7:
-                    w = -6 * (TileSize / 9);
-                    break;
-                case 8:
-                    w = -8 * (TileSize / 9);
-                    break;
-            }
-
-            Vector3 dist = new Vector3(h, 0f, w);
-            return dist;
-        }
-
-        // RemoveTile: Disconnects a Tile from the board, 
-        //             Edits the disc array of tiles
-        //             Attachs tile to controller
-        public void RemoveTile(GameObject tile, GameObject disc, Transform conTrans)
-        {
-            int discID = disc.GetComponent<IDScript>().ID;
-            int tileID = tile.GetComponent<IDScript>().ID;
-
-            // Get array position of the tile
-            Vector2 pos = GetTileIndex(tile, disc);
-            // Use disc function to update the status of the pos in the array
-
-            tile.GetComponent<Transform>().SetParent(conTrans);
-            tile.GetComponent<Rigidbody>().isKinematic = true;
-            tile.GetComponent<Rigidbody>().useGravity = false;
-        }
-
-
-        // PlaceTile: Checks the position of the tile relative to disc,
-        //            Determines the corresponding grid position and location in array
-        //            If position is empty, disconnect tile from con and place on disk
-        //            Else do nothing, maybe flash outline red
-       public void PlaceTile(GameObject tile, GameObject disc)
-        {
-            int discID = disc.GetComponent<IDScript>().ID;
-            int tileID = tile.GetComponent<IDScript>().ID;
-
-            // temporarily make the tile a child of the disc to get local pos
-            tile.GetComponent<Transform>().SetParent(disc.transform);
-            tile.GetComponent<Rigidbody>().isKinematic = true;
-            tile.GetComponent<Rigidbody>().useGravity = false;
-
-            Vector2 pos = GetTileIndex(tile, disc);
-            int xpos = Mathf.RoundToInt(pos.x);
-            int ypos = Mathf.RoundToInt(pos.y);
-
-            Disc newDisc = new Disc();
-            newDisc = Discs[discID];
-            // Check if that cell is full
-            // if it is, don't place the tile, break
-            if (pos.x == 100 || pos.y == 100)
-            {
-                Debug.LogError("Invalid tile location, position returned values x = " + pos.x + " and y = "+ pos.y + " check GetTileIndex function in DiscHandler");
-            }
-            else if (newDisc.tiles[xpos, ypos] == null)
-            {
-                Debug.Log("Position is null, so a tile can be placed at x-position: " + xpos + " y-position: " + ypos);
-
-                //The new disc is updated and then will be used to overwrite that ID in disc ID's
-                newDisc.tiles[xpos, ypos] = Tiles[tileID];
-                Discs[discID] = newDisc;
-            }
-
-            Vector3 dist = GetCellCenter(pos);
-
-            tile.GetComponent<Transform>().localPosition = dist;
-            tile.GetComponent<Transform>().rotation = disc.transform.rotation;
-
-        }*/
-
-        /*void makeDisc(int size)
-        {
-            Disc newDisc = new Disc();
-            ID = Random.Range(00000, 99999);
-            while (Discs.ContainsKey(ID))
-            {
-                ID = Random.Range(00000, 99999);
-                Debug.Log("Getting new ID for Disc");
-            }
-            Discs[ID] = newDisc;
-        }*/
-    }
-}
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,10 +43,13 @@ public class Tile : MonoBehaviour
     //There are 3 types of tiles, if tiles, sitch tiles, and flow tiles
     string[] tile_types = new string[] { "if", "switch", "flow" };
 
-    public Tile(Dictionary<string, signal> side)
+    public Tile(Dictionary<string, signal> side, int if_type, string tiletype, tile_location tile_loca)
     {
-
+        //poorly written code but allows me to initalize a tile with all the necessary bits and bobs
         sides = side;
+        iftype = if_type;
+        tile_type = tiletype;
+        tile_loc = tile_loca;
     }
 
     public Tile()
@@ -73,11 +77,11 @@ public class Tile : MonoBehaviour
 
 
 
-    public void print_signal(signal p_signal)
+    public void print_signal(signal p_signal, int num)
     {
 
-        Debug.Log("units: " + p_signal.units);
-        Debug.Log("I/O: " + p_signal.inout);
+        print(" tile num " + num + " units: " + p_signal.units);
+        print("tile num " + num + " I/O: " + p_signal.inout);
     }
 
     public signal ifthen(Tile tile, string inputA, string inputB, string data_flow) //Input A is checked against input B. If the value is true then the data flow is sent through the output.
@@ -90,7 +94,8 @@ public class Tile : MonoBehaviour
             case 0: //in this case we have a less than
                 if (tile.sides[inputA].units < tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 1);
+                    return_data = new signal(1, 1);
+                    print("less than chosen: statement is true!");
                     return return_data;
                 }
                 else
@@ -102,7 +107,8 @@ public class Tile : MonoBehaviour
             case 1: //in this case we have greather than chosen
                 if (tile.sides[inputA].units > tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 1);
+                    return_data = new signal(1, 1);
+                    print("greather than chosen: statement is true!");
                     return return_data;
                 }
                 else
@@ -114,7 +120,9 @@ public class Tile : MonoBehaviour
             case 2: //in this case we have less than or equal to
                 if (tile.sides[inputA].units <= tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 1);
+                    //sets signal streingth to 1 and sends it through return data
+                    return_data = new signal(1, 1);
+                    print("less than or equal to chosen: statement is true!");
                     return return_data;
                 }
                 else
@@ -126,7 +134,8 @@ public class Tile : MonoBehaviour
             case 3: //In this case we have greater than or equal to
                 if (tile.sides[inputA].units >= tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 1);
+                    return_data = new signal(1, 1);
+                    print("greather than or equal to chosen: statement is true!");
                     return return_data;
                 }
                 else
@@ -138,7 +147,8 @@ public class Tile : MonoBehaviour
             case 4: //In this case we have equal to
                 if (tile.sides[inputA].units == tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 'O');
+                    return_data = new signal(1, 1);
+                    print("equal to chosen: statement is true");
                     return return_data;
                 }
                 else
@@ -150,7 +160,8 @@ public class Tile : MonoBehaviour
             case 5: //In this case we have not equal to
                 if (tile.sides[inputA].units != tile.sides[inputB].units)
                 {
-                    return_data = new signal(tile.sides[data_flow].units, 'O');
+                    return_data = new signal(1, 1);
+                    print("not equal to chosen: statement is true!");
                     return return_data;
                 }
                 else
@@ -167,18 +178,23 @@ public class Tile : MonoBehaviour
         return return_data; //returns the default tile data struct outputing the netural element at 0 units
     }
 
-    public void print_tile() //Prints out the data in the tile by printing the dictionary
+    public void print_tile(int num) //Prints out the data in the tile by printing the dictionary
     {
         foreach (KeyValuePair<string, signal> flow in sides)
         {
-            Debug.Log("Side:" + flow.Key);
-            print_signal(flow.Value);
+            //if the key does indeed exist it prints it
+            if (flow.Key != null)
+            {
+                print("tile num " + num + " Side:" + flow.Key);
+                print_signal(flow.Value, num);
+            }
+            else print("tile side: " + flow.Key + " not properly setup");
         }
     }
 
     public void print_iftile()
     {
-        print_tile();
+       // print_tile(num);
         //Debug.Log("type: " + types[type]); //references the array of types to pring out the work for the type of tile it is
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class switchTile : Tile
 {
-    public bool inversion;
+    /*public bool inversion;
 
     public switchTile(Dictionary<string, signal> side)
     {
@@ -73,5 +73,5 @@ public class switchTile : Tile
     {
         print_tile();
         Debug.Log("inversion is: " + inversion);
-    }
+    }*/
 }
