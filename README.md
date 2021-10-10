@@ -6,7 +6,7 @@ University. It is a proof of concept and lacks a proper tutorial but
 is the start to a puzzle game.
 
 
-Here's a video of the game in action. All in game sound effects are free use
+Here's a video of the game in action. All in game sound effects are free use,
 All in game music was created by me
 
-https://drive.google.com/file/d/15Xt5uhDgaYvcsdlwcVla6j2yIspYkpiV/view?usp=drivesdk
+[video](https://drive.google.com/file/d/15Xt5uhDgaYvcsdlwcVla6j2yIspYkpiV/view?usp=drivesdk)
